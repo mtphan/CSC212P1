@@ -18,7 +18,7 @@ public class DrawFish {
 	 * 
 	 * @author jfoley
 	 */
-	public static void facingLeft(Graphics2D g, Color color, int x, int y) {
+	public static void facingLeft(Graphics2D g, Color color, double x, double y) {
 		// Draw the fish.
 		g.setColor(color);
 
@@ -54,7 +54,7 @@ public class DrawFish {
 	 * @param x the x-coordinate of the position to draw the fish.
 	 * @param y the y-coordinate of the position to draw the fish.
 	 */
-	public static void facingRight(Graphics2D g, Color color, int x, int y) {
+	public static void facingRight(Graphics2D g, Color color, double x, double y) {
 		Graphics2D flipped = (Graphics2D) g.create();
 		flipped.translate(x, y);
 		flipped.scale(-1, 1);
@@ -71,7 +71,7 @@ public class DrawFish {
 	 * @param x the x-coordinate of the position to draw the fish.
 	 * @param y the y-coordinate of the position to draw the fish.
 	 */
-	public static void smallFacingLeft(Graphics2D g, Color color, int x, int y) {
+	public static void smallFacingLeft(Graphics2D g, Color color, double x, double y) {
 		Graphics2D halfSize = (Graphics2D) g.create();
 		halfSize.translate(x, y);
 		halfSize.scale(0.5, 0.5);
@@ -88,7 +88,7 @@ public class DrawFish {
 	 * @param x the x-coordinate of the position to draw the fish.
 	 * @param y the y-coordinate of the position to draw the fish.
 	 */
-	public static void smallFacingRight(Graphics2D g, Color color, int x, int y) {
+	public static void smallFacingRight(Graphics2D g, Color color, double x, double y) {
 		Graphics2D halfSize = (Graphics2D) g.create();
 		halfSize.translate(x, y);
 		halfSize.scale(-0.5, 0.5);

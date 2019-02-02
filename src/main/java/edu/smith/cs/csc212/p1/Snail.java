@@ -24,6 +24,9 @@ public class Snail {
 	 * The position of the Snail; y-coordinate.
 	 */
 	public int y;
+	public int speed;
+	
+	public boolean isSleeping;
 	
 	/**
 	 * Create a snail at (sx, sy) with position s.
@@ -35,6 +38,8 @@ public class Snail {
 		this.setSide(s);
 		this.x = sx;
 		this.y = sy;
+		this.speed = 15;
+		this.isSleeping = true;
 	}
 	
 	/**
@@ -46,10 +51,64 @@ public class Snail {
 	}
 	
 	/**
-	 * TODO: move the snail about.
+	 * Get variable isSleeping.
+	 * @return
+	 */
+	public boolean getIsSleeping() {
+		return isSleeping;
+	}
+	
+	/**
+	 * Clean the sink by decreasing its greeness.
+	 * @param greeness
+	 * @return
+	 */
+	public int clean(int greeness) {
+		// Wake snail up at greeness = 150.
+		if (greeness > 150) {
+			isSleeping = false;
+		}
+		// Start cleaning...
+		if (!isSleeping) {
+			greeness -= 1;
+		}
+		// Go to sleep when greeness reaches 0 or less.
+		if (greeness <= 0) {
+			greeness = 0;
+			isSleeping = true;
+		}
+		return greeness;
+	}
+	
+	/**
+	 * Move the snail about.
 	 */
 	public void move() {
-		
+		if ("bottom".equals(this.side)) {
+			this.x -= this.speed;
+			if (this.x <= 0) {
+				this.x = 50;
+				setSide("left");
+			}
+		} else if ("top".equals(this.side)) {
+			this.x += this.speed;
+			if (this.x >= Aquarium.WIDTH) {
+				this.x = Aquarium.WIDTH - 50;
+				setSide("right");
+			}
+		} else if ("left".equals(this.side)) { 
+			this.y -= this.speed;
+			if (this.y <= 0) {
+				this.y = HEIGHT;
+				setSide("top");
+			}
+		} else { // we don't have to say "right" here.
+			this.y += this.speed;
+			if (this.y >= Aquarium.HEIGHT) {
+				this.y = Aquarium.HEIGHT - 50;
+				setSide("bottom");
+			}
+		}
 	}
 		
 	/**
@@ -59,27 +118,37 @@ public class Snail {
 	public void draw(Graphics2D g) {
 		// By calling move here, if we want to move our snail, we can do so.
 		// Move gets called by draw, so whenever draw gets called.
-		this.move();
+		if (!isSleeping) {
+			this.move();
+		}
 		
 		// By making a new Graphics2D object, we can move everything that gets drawn to it.
 		// This is kind of tricky to wrap your head around, so I gave it to you.
 		Graphics2D position = (Graphics2D) g.create();
 		position.translate(x, y);
 		
+		Color eyeColor = Color.white;
+		Color pupilColor = Color.black;
+		
+		if (isSleeping) {
+			eyeColor = Color.red;
+			pupilColor = Color.red;
+		}
+		
 		// Note that I need to compare strings with ".equals" this is a Java weirdness.
 		if ("bottom".equals(this.side)) {
-			drawSnail(position, Color.red, Color.white, Color.black);
+			drawSnail(position, Color.red, Color.white, eyeColor, pupilColor);
 		} else if ("top".equals(this.side)) {
 			position.scale(-1, -1);
-			drawSnail(position, Color.red, Color.white, Color.black);
+			drawSnail(position, Color.red, Color.white, eyeColor, pupilColor);
 		} else if ("left".equals(this.side)) { 
 			// Oh no, radians.
 			position.rotate(Math.PI/2);
-			drawSnail(position, Color.red, Color.white, Color.black);
+			drawSnail(position, Color.red, Color.white, eyeColor, pupilColor);
 		} else { // we don't have to say "right" here.
 			// Oh no, radians.
 			position.rotate(-Math.PI/2);
-			drawSnail(position, Color.red, Color.white, Color.black);
+			drawSnail(position, Color.red, Color.white, eyeColor, pupilColor);
 		}
 		
 		// It's OK if you forget this, Java will eventually notice, but better to have it!
@@ -93,7 +162,7 @@ public class Snail {
 	 * @param shellColor The color of the snail shell.
 	 * @param eyeColor The color of the snail eye.
 	 */
-	public static void drawSnail(Graphics2D g, Color bodyColor, Color shellColor, Color eyeColor) {
+	public static void drawSnail(Graphics2D g, Color bodyColor, Color shellColor, Color eyeColor, Color pupilColor) {
 		Shape body = new Rectangle2D.Double(0,0,40,50);
 		Shape tentacleL = new Rectangle2D.Double(0,-20,5,20);
 		Shape eyeWhiteL = new Ellipse2D.Double(-4, -28, 12, 12);
@@ -102,20 +171,21 @@ public class Snail {
 		g.setColor(bodyColor);
 		g.fill(body);
 		g.fill(tentacleL);
-		g.setColor(Color.white);
-		g.fill(eyeWhiteL);
-		g.setColor(eyeColor);
-		g.fill(eyePupilL);
 		
+		g.setColor(eyeColor);
+		g.fill(eyeWhiteL);
+		g.setColor(pupilColor);
+		g.fill(eyePupilL);
+
 		Shape tentacleR = new Rectangle2D.Double(35,-20,5,20);
 		Shape eyeWhiteR = new Ellipse2D.Double(35-4, -28, 12, 12);
 		Shape eyePupilR = new Ellipse2D.Double(35+2, -26+4, 4, 4);
 		
 		g.setColor(bodyColor);
 		g.fill(tentacleR);
-		g.setColor(Color.white);
-		g.fill(eyeWhiteR);
 		g.setColor(eyeColor);
+		g.fill(eyeWhiteR);
+		g.setColor(pupilColor);
 		g.fill(eyePupilR);
 		
 		Shape shell3 = new Ellipse2D.Double(45, 20, 10, 10);

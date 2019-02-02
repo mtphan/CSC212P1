@@ -2,6 +2,7 @@ package edu.smith.cs.csc212.p1;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.Random;
 
 import me.jjfoley.gfx.GFX;
 
@@ -21,16 +22,31 @@ public class Aquarium extends GFX {
 	/**
 	 * This is a static variable that tells us how wide the aquarium is.
 	 */
-	public static int WIDTH = 500;
+	public static int WIDTH = 1000;
 	/**
 	 * This is a static variable that tells us how tall the aquarium is.
 	 */
-	public static int HEIGHT = 500;
+	public static int HEIGHT = 600;
 	
 	/**
 	 * Put a snail on the top of the tank.
 	 */
 	Snail algorithm = new Snail(177, Snail.HEIGHT+1, "top");
+	
+	/**
+	 * fishArr stores pointers to fish objects in the tank.
+	 */
+	public Fish[] fishArr = new Fish[10];
+
+	/**
+	 * BubbleSystem that control bubbles.
+	 */
+	BubbleSystem bubbles = new BubbleSystem();
+	
+	/**
+	 * Greeness of the tank.
+	 */
+	int greeness = 0;
 	
 	/**
 	 * This is a constructor, code that runs when we make a new Aquarium.
@@ -39,31 +55,48 @@ public class Aquarium extends GFX {
 		// Here we ask GFX to make our window of size WIDTH and HEIGHT.
 		// Don't change this here, edit the variables instead.
 		super(WIDTH, HEIGHT);
+		
+		// Generate some number of fish.
+		Random rand = new Random();
+		for (int i=0; i<fishArr.length; i++) {
+			
+			// Pick random x,y, color, isLittle and facingLeft.
+			double x = WIDTH*rand.nextDouble();
+			double y = HEIGHT*rand.nextDouble();
+			Color c = new Color(rand.nextInt(205)+50, rand.nextInt(205)+50, rand.nextInt(205)+50);
+			boolean little = rand.nextBoolean();
+			boolean left = rand.nextBoolean();
+			
+			// Add the fish into fishArr.
+			fishArr[i] = new Fish(c, x, y, left, little);
+		}
+		
 	}
-
-	int fish1X = getWidth() + 100;
-	int fish2X = getWidth() + 300;
-
+	
 	@Override
 	public void draw(Graphics2D g) {
 		// Draw the "ocean" background.
-		g.setColor(Color.blue);
-		g.fillRect(0, 0, getWidth(), getHeight());
-
-		// Draw the fish!
-		DrawFish.facingLeft(g, Color.yellow, fish1X, 200);
-		// Draw the confused fish!
-		DrawFish.facingRight(g, Color.green, fish2X, 300);
-
-		// What if we wanted this little fish to swim, too?
-		DrawFish.smallFacingLeft(g, Color.red, 200, 100);
+		g.setColor(new Color(0, greeness, 100));
 		
+		// Green-fy the sink if Algorithm is sleeping.
+		if (algorithm.getIsSleeping()) {
+			greeness += 1;
+		}
+		// Algorithm cleans the sink.
+		greeness = algorithm.clean(greeness);
+		g.fillRect(0, 0, getWidth(), getHeight());
+		
+		// Draw our bubbles.
+		bubbles.draw(g);
+
 		// Draw our snail!
 		algorithm.draw(g);
-
-		// Move the fish!
-		fish1X -= 1;
-		fish2X -= 2;
+		
+		// Draw all the fish in fishArr!
+		for (Fish fish : fishArr) {
+			fish.draw(g);
+		}
+	
 	}
 
 	public static void main(String[] args) {
