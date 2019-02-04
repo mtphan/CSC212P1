@@ -29,7 +29,7 @@ public class BubbleSystem {
 			
 			// 20% chance of making a bubble that appear from the clamp
 			if (rand.nextDouble() < 0.2) {
-				bubbleArr[i] = new Bubble(sourceX + 30, y, size, true);
+				bubbleArr[i] = new Bubble(sourceX + 80*rand.nextDouble(), y, size, true);
 			// Else make it a normal bubble that float up from the bottom
 			} else {
 				double x = 50 + (Aquarium.WIDTH-100) * rand.nextDouble();

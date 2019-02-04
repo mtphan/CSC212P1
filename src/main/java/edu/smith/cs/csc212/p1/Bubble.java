@@ -22,8 +22,6 @@ public class Bubble {
 	
 	// Variable for bubble that "pop out" from clamp.
 	boolean isPop;
-	// Where to respawn after it already float up off screen (different for.
-	double repop;
 	
 	public Bubble(double startX, double startY, int s, boolean pop) {
 		this.x = startX;

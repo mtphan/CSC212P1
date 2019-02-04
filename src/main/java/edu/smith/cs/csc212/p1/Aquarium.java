@@ -58,12 +58,12 @@ public class Aquarium extends GFX {
 		
 		// Generate some number of fish.
 		Random rand = new Random();
-		for (int i=0; i<fishArr.length; i++) {
+		for (int i=0; i<this.fishArr.length; i++) {
 			
 			// Pick random x,y, color, isLittle and facingLeft.
 			double x = WIDTH*rand.nextDouble();
 			double y = HEIGHT*rand.nextDouble();
-			Color c = new Color(rand.nextInt(205)+50, rand.nextInt(205)+50, rand.nextInt(205)+50);
+			Color c = Color.getHSBColor(rand.nextFloat(), 0.8f, 1.0f);
 			boolean little = rand.nextBoolean();
 			boolean left = rand.nextBoolean();
 			

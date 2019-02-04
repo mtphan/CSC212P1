@@ -125,4 +125,8 @@ public class Fish {
 			facingLeft = false;
 		}
 	}
+	
+	public void hungry() {
+		
+	}
 }
