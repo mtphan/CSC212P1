@@ -6,23 +6,48 @@ import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.util.Random;
 
+/**
+ * A class which create instances of bubble.
+ * Bubbles will follow a sinusoidal path instead of floating up straight.
+ * @author Minh Phuong
+ *
+ */
 public class Bubble {
 	
-	public double x;
-	public double y;
+	/**
+	 * Location variable.
+	 */
+	public double x, y;
+	
+	/**
+	 * Float speed variable.
+	 */
 	public double speedY;
 	
-	//Bubble path: a*sin(b*x)
-	double a;
-	double b;
-	public double wiggle;
+	/**
+	 * Bubble path variable for x: wiggle = a*sin(y/b)
+	 */
+	public double a, b, wiggle;
 	
+	/**
+	 * Bubble size variable.
+	 */
 	public int size;
 	Random rand = new Random();
 	
-	// Variable for bubble that "pop out" from clamp.
+	/**
+	 * Variable for bubble that "pop out" from clamp.
+	 */
 	boolean isPop;
 	
+	/**
+	 * Create a bubble at position (startX, startY) with size s.
+	 * Pop determined if it's a bubble pop out from a clam.
+	 * @param startX - start X position (upper corner)
+	 * @param startY - start Y position (upper corner)
+	 * @param s - size
+	 * @param pop - is it a "pop out" bubble?
+	 */
 	public Bubble(double startX, double startY, int s, boolean pop) {
 		this.x = startX;
 		this.y = startY;
@@ -33,6 +58,10 @@ public class Bubble {
 		this.isPop = pop;
 	}
 	
+	/**
+	 * Draw bubbles according to its x and y.
+	 * @param g - canvas
+	 */
 	public void draw(Graphics2D g) {
 		// Draw bubble.
 		// Set g to a color white with transparency.
@@ -46,6 +75,9 @@ public class Bubble {
 		rise();
 	}
 	
+	/**
+	 * Move bubble in a sinuisoidal path.
+	 */
 	public void rise() {
 		this.y -= speedY;
 		// If off-screen.

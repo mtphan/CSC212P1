@@ -2,6 +2,8 @@ package edu.smith.cs.csc212.p1;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import me.jjfoley.gfx.GFX;
@@ -22,11 +24,11 @@ public class Aquarium extends GFX {
 	/**
 	 * This is a static variable that tells us how wide the aquarium is.
 	 */
-	public static int WIDTH = 1000;
+	public static int WIDTH = 1200;
 	/**
 	 * This is a static variable that tells us how tall the aquarium is.
 	 */
-	public static int HEIGHT = 600;
+	public static int HEIGHT = 700;
 	
 	/**
 	 * Put a snail on the top of the tank.
@@ -34,19 +36,31 @@ public class Aquarium extends GFX {
 	Snail algorithm = new Snail(177, Snail.HEIGHT+1, "top");
 	
 	/**
-	 * fishArr stores pointers to fish objects in the tank.
-	 */
-	public Fish[] fishArr = new Fish[10];
-
-	/**
 	 * BubbleSystem that control bubbles.
 	 */
 	BubbleSystem bubbles = new BubbleSystem();
 	
 	/**
-	 * Greeness of the tank.
+	 * Feeder that drops food pellets for hungry fish.
 	 */
-	int greeness = 0;
+	Feeder feeder;
+	
+	/**
+	 * Greenness of the tank. Starts at 0.
+	 */
+	int greenness = 0;
+	
+	/**
+	 * Stores pointers to non HungryFish fish in the tank.
+	 */
+	List<Fish> normalFish = new ArrayList<>();
+	
+	/**
+	 * List of all the fish that are HungryFish.
+	 */
+	List<HungryFish> hungryFish = new ArrayList<>();
+	
+	Random rand = new Random();
 	
 	/**
 	 * This is a constructor, code that runs when we make a new Aquarium.
@@ -55,10 +69,19 @@ public class Aquarium extends GFX {
 		// Here we ask GFX to make our window of size WIDTH and HEIGHT.
 		// Don't change this here, edit the variables instead.
 		super(WIDTH, HEIGHT);
+		int fishNum = 10;
+		createFish(fishNum);
 		
-		// Generate some number of fish.
-		Random rand = new Random();
-		for (int i=0; i<this.fishArr.length; i++) {
+		// Create feeder instance with the number of food pellet equal to number of HungryFish.
+		feeder = new Feeder(this.hungryFish.size());
+	}
+	
+	/**
+	 * Create a bunch of fish with random attributes.
+	 * @param fishNum - total number of fish in the tank.
+	 */
+	public void createFish(int fishNum) {
+		for (int i=0; i<fishNum; i++) {
 			
 			// Pick random x,y, color, isLittle and facingLeft.
 			double x = WIDTH*rand.nextDouble();
@@ -67,36 +90,78 @@ public class Aquarium extends GFX {
 			boolean little = rand.nextBoolean();
 			boolean left = rand.nextBoolean();
 			
-			// Add the fish into fishArr.
-			fishArr[i] = new Fish(c, x, y, left, little);
-		}
-		
+			// Choose to create HungryFish or normal Fish randomly.
+			if (rand.nextBoolean()) {
+				this.hungryFish.add(new HungryFish(c, x, y, left, little));
+			} else {
+				this.normalFish.add(new Fish(c, x, y, left, little));
+			}
+		}	
 	}
 	
 	@Override
 	public void draw(Graphics2D g) {
 		// Draw the "ocean" background.
-		g.setColor(new Color(0, greeness, 100));
+		g.setColor(new Color(0, greenness, 100));
 		
 		// Green-fy the sink if Algorithm is sleeping.
 		if (algorithm.getIsSleeping()) {
-			greeness += 1;
+			greenness += 1;
 		}
-		// Algorithm cleans the sink.
-		greeness = algorithm.clean(greeness);
+		
+		// Algorithm the Snail cleans the sink. We draw him later.
+		greenness = algorithm.clean(greenness);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		
-		// Draw our bubbles.
+		// Loop over all the hungry fish.
+		for (int i=0; i<hungryFish.size(); i++) {
+			
+			// Pick destination when not hungry.
+			if (!hungryFish.get(i).getIsHungry()) {
+				hungryFish.get(i).pickDestination();
+			} else {
+				// Feeder drop food when hungry. Each HungryFish has a food pellet that
+				// corresponds to itself, which will be dropped by the feeder when it is hungry.
+				feeder.dropFood(g, i);
+				
+				// If the food is visible (i.e. has fell out of the tube)
+				if (feeder.visible(i)) {
+					// Fish immediately go toward the food.
+					hungryFish.get(i).pickDestination(Feeder.pellets[i].getX(),
+							  						  Feeder.pellets[i].getY());
+					
+					// When fish reaches food, fish eat food and food's position is reset.
+					if (hungryFish.get(i).reachDestination()) {
+						hungryFish.get(i).ate();
+						feeder.reset(i);
+					}
+				// Fish stays in the food zone (under the tube) when food is not visible.
+				} else {
+					hungryFish.get(i).pickDestination(Feeder.feederX, Feeder.feederX + Feeder.feederW,
+													  Feeder.feederH + 60, HEIGHT);
+				}
+			}
+		}
+
+		// Draw the feeder.
+		feeder.drawFeeder(g);
+		
+		// Draw our bubbles + bubble source.
 		bubbles.draw(g);
 
 		// Draw our snail!
-		algorithm.draw(g);
+		algorithm.draw(g);		
 		
 		// Draw all the fish in fishArr!
-		for (Fish fish : fishArr) {
+		for (Fish fish : normalFish) {
 			fish.draw(g);
+			fish.pickDestination();
 		}
 	
+		// Draw all fish in hungryFish!
+		for (HungryFish fish : hungryFish) {
+			fish.draw(g);
+		}
 	}
 
 	public static void main(String[] args) {

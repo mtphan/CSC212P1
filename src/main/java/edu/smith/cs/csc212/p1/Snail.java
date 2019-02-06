@@ -24,6 +24,10 @@ public class Snail {
 	 * The position of the Snail; y-coordinate.
 	 */
 	public int y;
+	
+	/**
+	 * Moving speed of the snail.
+	 */
 	public int speed;
 	
 	public boolean isSleeping;
@@ -52,38 +56,39 @@ public class Snail {
 	
 	/**
 	 * Get variable isSleeping.
-	 * @return
+	 * @return boolean - true if snail is sleeping, false if otherwise.
 	 */
 	public boolean getIsSleeping() {
 		return isSleeping;
 	}
 	
 	/**
-	 * Clean the sink by decreasing its greeness.
-	 * @param greeness
-	 * @return
+	 * Clean the sink by decreasing its greenness. Greenness is passed in as a parameter.
+	 * @param greenness - the green component in the RGB of the background.
+	 * @return greenness - return greenness after the tank was "cleaned" a little bit.
 	 */
-	public int clean(int greeness) {
-		// Wake snail up at greeness = 150.
-		if (greeness > 150) {
+	public int clean(int greenness) {
+		// Wake snail up at greenness = 150.
+		if (greenness > 150) {
 			isSleeping = false;
 		}
 		// Start cleaning...
 		if (!isSleeping) {
-			greeness -= 1;
+			greenness -= 1;
 		}
-		// Go to sleep when greeness reaches 0 or less.
-		if (greeness <= 0) {
-			greeness = 0;
+		// Go to sleep when greenness reaches 0 or less.
+		if (greenness <= 0) {
+			greenness = 0;
 			isSleeping = true;
 		}
-		return greeness;
+		return greenness;
 	}
 	
 	/**
 	 * Move the snail about.
 	 */
 	public void move() {
+		// Move the snail and flip in depends on its current side and position.
 		if ("bottom".equals(this.side)) {
 			this.x -= this.speed;
 			if (this.x <= 0) {
