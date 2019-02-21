@@ -34,7 +34,7 @@ public class BubbleSystem {
 		// Generate random bubbles.
 		for (int i=0; i<bubbleArr.length; i++) {
 			// Random size.
-			int size = 10 + rand.nextInt(40);
+			int size = 10 + rand.nextInt(41);
 			// Initial random y.
 			double y = Aquarium.HEIGHT * rand.nextDouble();
 			

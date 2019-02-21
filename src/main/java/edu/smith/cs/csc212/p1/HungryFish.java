@@ -43,7 +43,7 @@ public class HungryFish extends Fish {
 	public HungryFish(Color c, double startX, double startY, boolean left, boolean little) {
 		super(c, startX, startY, left, little);
 		
-		this.hungerMax = 1000 + rand.nextInt(2000);
+		this.hungerMax = 1000 + rand.nextInt(2001);
 		this.hunger = this.hungerMax;
 		this.isHungry = false;
 	}

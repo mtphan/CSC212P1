@@ -2,7 +2,6 @@ package edu.smith.cs.csc212.p1;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-
 import java.util.Random;
 
 /**
@@ -57,8 +56,11 @@ public class Fish {
 	public Fish(Color c, double startX, double startY, boolean left, boolean little) {
 		this.x = startX;
 		this.y = startY;
+		
+		// Initialize a destination. Needed because the logic of my code make it so that without destination they will swim towards infinity.
 		this.destX = startX + 1;
 		this.destY = startY + 1;
+		
 		this.color = c;
 		this.facingLeft = left;
 		this.isLittle = little;
@@ -91,13 +93,11 @@ public class Fish {
 	}
 	
 	/**
-	 * Change position of fish.
+	 * Change position of fish by an amount.
 	 */
 	public void swim() {
-		if (!reachDestination()) {
-			this.x -= speedX;
-			this.y -= speedY;
-		}
+		this.x -= speedX;
+		this.y -= speedY;
 	}
 	
 	/**
@@ -105,11 +105,10 @@ public class Fish {
 	 * @return boolean - true for destination reached, false for not.
 	 */
 	public boolean reachDestination() {
-		double eps = 3;
 		
 		// If fish is not close to destination (within 3 pixel of destination).
-		if ((Math.abs(this.x - this.destX) >= eps) || 
-			(Math.abs(this.y - this.destY) >= eps)) {
+		if ((Math.abs(this.x - this.destX) >= 3) || 
+			(Math.abs(this.y - this.destY) >= 3)) {
 			return false;
 			// If fish reaches destination.
 		} else {
@@ -122,7 +121,7 @@ public class Fish {
 	 * @param g - canvas
 	 */
 	public void draw(Graphics2D g) {
-		// If fish not swimming (i.e. reach destination), pick new destination.
+		// Swim away!
 		swim();
 		
 		// A bunch of if statements to decide which DrawFish methods to call.
@@ -139,24 +138,21 @@ public class Fish {
 				DrawFish.facingRight(g, color, x, y);
 			}
 		}
-		
-		/*
-		 * Uncomment + import to see destination of the fish drawn in the form of small colored dot.
-		 * 
-		 * Shape dest = new Ellipse2D.Double(destX, destY, 10, 10);
-		 * g.setColor(color);
-		 * g.fill(dest);
-		 * g.setColor(Color.black);
-		 * g.draw(dest);
-		 */
-		
+				
+//		 Uncomment + import to see destination of the fish drawn in the form of small colored dot.
+/*		 Shape dest = new Ellipse2D.Double(destX, destY, 10, 10);
+		 g.setColor(color);
+		 g.fill(dest);
+		 g.setColor(Color.black);
+		 g.draw(dest);
+*/		
 	}
 	
 	/**
 	 * General method to pick a random destination.
 	 */
 	public void pickDestination() {
-		// Pick a random destination
+		// Pick a random destination only when reached destination.
 		if (reachDestination()) {
 			this.destX = Aquarium.WIDTH*rand.nextDouble();
 			this.destY = Aquarium.HEIGHT*rand.nextDouble();

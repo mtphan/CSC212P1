@@ -30,6 +30,9 @@ public class Snail {
 	 */
 	public int speed;
 	
+	/**
+	 * Boolean for whether or not the snail is sleeping. Pretty self-explanatory.
+	 */
 	public boolean isSleeping;
 	
 	/**
@@ -107,7 +110,7 @@ public class Snail {
 				this.y = HEIGHT;
 				setSide("top");
 			}
-		} else { // we don't have to say "right" here.
+		} else {
 			this.y += this.speed;
 			if (this.y >= Aquarium.HEIGHT) {
 				this.y = Aquarium.HEIGHT - 50;

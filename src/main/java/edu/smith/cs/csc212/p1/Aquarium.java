@@ -51,9 +51,9 @@ public class Aquarium extends GFX {
 	int greenness = 0;
 	
 	/**
-	 * Stores pointers to non HungryFish fish in the tank.
+	 * Stores pointers to all Fish objects in the tank.
 	 */
-	List<Fish> normalFish = new ArrayList<>();
+	List<Fish> fishLst = new ArrayList<>();
 	
 	/**
 	 * List of all the fish that are HungryFish.
@@ -61,6 +61,11 @@ public class Aquarium extends GFX {
 	List<HungryFish> hungryFish = new ArrayList<>();
 	
 	Random rand = new Random();
+	
+	/**
+	 * Shark variable.
+	 */
+	Shark megalodon = new Shark(WIDTH*rand.nextDouble(), HEIGHT*rand.nextDouble(), rand.nextBoolean());
 	
 	/**
 	 * This is a constructor, code that runs when we make a new Aquarium.
@@ -92,13 +97,63 @@ public class Aquarium extends GFX {
 			
 			// Choose to create HungryFish or normal Fish randomly.
 			if (rand.nextBoolean()) {
-				this.hungryFish.add(new HungryFish(c, x, y, left, little));
+				// Add HungryFish into hungryFish list AND fishArr.
+				HungryFish fishPointer = new HungryFish(c, x, y, left, little);
+				this.hungryFish.add(fishPointer);
+				this.fishLst.add(fishPointer);
 			} else {
-				this.normalFish.add(new Fish(c, x, y, left, little));
+				this.fishLst.add(new Fish(c, x, y, left, little));
 			}
-		}	
+		}
 	}
 	
+	public void pickAllDestinations(Graphics2D g) {
+		// Pick destination for the HungryFish
+		for (HungryFish fish : hungryFish) {
+			
+			// Pick destination fish is hungry.
+			if (fish.getIsHungry()) {
+				// Feeder drop food when hungry. Each HungryFish has a food pellet that
+				// corresponds to itself, which will be dropped by the feeder when it is hungry.
+				feeder.dropFood(g, hungryFish.indexOf(fish));
+				
+				// If the food is visible (i.e. has fell out of the tube)
+				if (feeder.visible(hungryFish.indexOf(fish))) {
+					// Fish immediately go toward the food. Continuing updating the food's position
+					hungryFish.get(hungryFish.indexOf(fish)).pickDestination(Feeder.pellets[hungryFish.indexOf(fish)].getX(),
+													  		 				 Feeder.pellets[hungryFish.indexOf(fish)].getY());
+					
+					// When fish reaches food, fish eat food and food's position is reset.
+					if (fish.reachDestination()) {
+						fish.ate();
+						feeder.reset(hungryFish.indexOf(fish));
+					}
+				// Fish stays in the food zone (under the tube) when food is not visible.
+				} else {
+					hungryFish.get(hungryFish.indexOf(fish)).pickDestination(Feeder.feederX, Feeder.feederX + Feeder.feederW,
+																			 Feeder.feederH + 60, HEIGHT);
+				}
+			}
+		}
+		
+		// Pick destination for the shark.
+		if (megalodon.reachDestination()) {
+			// Set the prey to be one of the fish in fishLst.
+			megalodon.setPreyNo(rand.nextInt(fishLst.size() - 1));
+		}
+		
+		// Shark goes to the fish. This pickDestination method allow constant updating.
+		// This shark is a vegetarian.
+		megalodon.pickDestination(fishLst.get(megalodon.getPreyNo()).getX(),
+								  fishLst.get(megalodon.getPreyNo()).getY());
+		
+		// Pick destination for all fish, including HungryFish and Shark.
+		// If HungryFish already picked a destination in the food zone it won't pick a new one here.
+		for (Fish fish : fishLst) {
+			fish.pickDestination();
+		}
+	}
+
 	@Override
 	public void draw(Graphics2D g) {
 		// Draw the "ocean" background.
@@ -113,36 +168,10 @@ public class Aquarium extends GFX {
 		greenness = algorithm.clean(greenness);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		
-		// Loop over all the hungry fish.
-		for (int i=0; i<hungryFish.size(); i++) {
-			
-			// Pick destination when not hungry.
-			if (!hungryFish.get(i).getIsHungry()) {
-				hungryFish.get(i).pickDestination();
-			} else {
-				// Feeder drop food when hungry. Each HungryFish has a food pellet that
-				// corresponds to itself, which will be dropped by the feeder when it is hungry.
-				feeder.dropFood(g, i);
-				
-				// If the food is visible (i.e. has fell out of the tube)
-				if (feeder.visible(i)) {
-					// Fish immediately go toward the food.
-					hungryFish.get(i).pickDestination(Feeder.pellets[i].getX(),
-							  						  Feeder.pellets[i].getY());
-					
-					// When fish reaches food, fish eat food and food's position is reset.
-					if (hungryFish.get(i).reachDestination()) {
-						hungryFish.get(i).ate();
-						feeder.reset(i);
-					}
-				// Fish stays in the food zone (under the tube) when food is not visible.
-				} else {
-					hungryFish.get(i).pickDestination(Feeder.feederX, Feeder.feederX + Feeder.feederW,
-													  Feeder.feederH + 60, HEIGHT);
-				}
-			}
-		}
 
+		// Pick destination for all the fish. Group them together because they are too long.
+		pickAllDestinations(g);
+		
 		// Draw the feeder.
 		feeder.drawFeeder(g);
 		
@@ -152,16 +181,13 @@ public class Aquarium extends GFX {
 		// Draw our snail!
 		algorithm.draw(g);		
 		
-		// Draw all the fish in fishArr!
-		for (Fish fish : normalFish) {
-			fish.draw(g);
-			fish.pickDestination();
-		}
-	
-		// Draw all fish in hungryFish!
-		for (HungryFish fish : hungryFish) {
+		// Draw all of our fish!
+		for (Fish fish : fishLst) {
 			fish.draw(g);
 		}
+		
+		// Draw our shark.
+		megalodon.draw(g);
 	}
 
 	public static void main(String[] args) {
@@ -170,5 +196,5 @@ public class Aquarium extends GFX {
 		GFX app = new Aquarium();
 		app.start();
 	}
-
+	
 }

@@ -95,4 +95,39 @@ public class DrawFish {
 		facingLeft(halfSize, color, 0, 0);
 		halfSize.dispose();
 	}
+
+	/**
+	 * This method is implemented by creating a new Graphics "world" located at x,y
+	 * that is 1.5 the size of a regular one and calling our regular Fish method.
+	 * 
+	 * @param g the original graphics world.
+	 * @param color the color of the fish!
+	 * @param x the x-coordinate of the position to draw the fish.
+	 * @param y the y-coordinate of the position to draw the fish.
+	 */
+	public static void bigFacingLeft(Graphics2D g, Color color, double x, double y) {
+		Graphics2D twiceSize = (Graphics2D) g.create();
+		twiceSize.translate(x, y);
+		twiceSize.scale(1.5, 1.5);
+		facingLeft(twiceSize, color, 0, 0);
+		twiceSize.dispose();
+	}
+	
+	/**
+	 * This method is implemented by creating a new Graphics "world" located at x,y
+	 * that is 1.5 the size of a regular one and calling our regular Fish method.
+	 * 
+	 * @param g the original graphics world.
+	 * @param color the color of the fish!
+	 * @param x the x-coordinate of the position to draw the fish.
+	 * @param y the y-coordinate of the position to draw the fish.
+	 */
+	public static void bigFacingRight(Graphics2D g, Color color, double x, double y) {
+		Graphics2D twiceSize = (Graphics2D) g.create();
+		twiceSize.translate(x, y);
+		twiceSize.scale(-1.5, 1.5);
+		facingLeft(twiceSize, color, 0, 0);
+		twiceSize.dispose();
+	}
+	
 }
