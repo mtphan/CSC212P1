@@ -63,7 +63,7 @@ I expect you to develop and improve on a Fish class. I don't expect you to be ab
 
 - int x, int y // Every fish should have its own position.
 - Color color // Every fish should have its own color.
-- // choose which method to call from Creatures.draw...Fish...()
+- // choose which method to call from DrawFish...Fish...()
 - boolean facingLeft
 - boolean isLittle
 
